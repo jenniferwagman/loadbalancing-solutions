@@ -4,13 +4,13 @@
   "parameters": {
     "dnsName": {
         "description": "Globally unique DNS Name for the Public IP used to access the Web Server VM. Must be all lowercase and use alpha-numeric characters only.",
-        "value": "GEN-UNIQUE"
+        "value": "jcwtestdnsvalue"
     },
     "adminUsername": {
-        "value": "GEN-USERNAME"
+        "value": "localAdmin"
     },
     "adminPassword": {
-        "value": "GEN-PASSWORD"
+        "value": "P@ssw0rd1234"
     }
   }
 }
