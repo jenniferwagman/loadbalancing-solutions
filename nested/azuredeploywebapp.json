@@ -2,36 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "size": {
-      "type": "string",
-      "allowedValues": [
-        "Standard_Small",
-        "Standard_Medium",
-        "Standard_Large"
-      ],
-      "defaultValue": "Standard_Medium",
-      "metadata": {
-        "description": "Application Gateway size/SKU"
-      }
-    },
-    "capacity": {
-      "type": "int",
-      "defaultValue": 2,
-      "metadata": {
-        "description": "Application Gateway instance number"
-      }
-    },
-    "cookieBasedAffinity": {
-      "type": "string",
-      "allowedValues": [
-        "Enabled",
-        "Disabled"
-      ],
-      "defaultValue": "Disabled",
-      "metadata": {
-        "description": "If cookie-based affinity is enabled the requests from the same client are hitting the same Web server"
-      }
-    },
     "adminUsername": {
       "type": "string",
       "minLength": 1,
@@ -77,7 +47,7 @@
       "type": "string",
       "minLength": 1,
       "metadata": {
-        "description": "Name for Application Gateway"
+        "description": "Name for Application"
       }
     },
     "_artifactsLocation": {
@@ -88,22 +58,11 @@
     }
   },
   "variables": {
-    "applicationGatewayName": "[parameters('webAppName')]",
     "publicIPAddressName": "[concat(parameters('webAppName'),'IP')]",
     "virtualNetworkName": "[concat(parameters('webAppName'),'VNet')]",
     "subnetName": "[concat(parameters('webAppName'),'Subnet')]",
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-    "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
-    "applicationGatewayID": "[resourceId('Microsoft.Network/applicationGateways',variables('applicationGatewayName'))]",
     "backendDnsPrefix": "[concat(parameters('webAppName'),'backend')]",
     "wsDeploymentName": "[concat(parameters('webAppName'),'ws')]",
-    "appGatewayIPConfigName": "[concat(parameters('webAppName'),'-ipconfig')]",
-    "appGatewayrequestRoutingRuleName": "[concat(parameters('webAppName'),'-rule1')]",
-    "appGatewayHttpListenerName": "[concat(parameters('webAppName'),'-listener')]",
-    "appGatewayBackendHttpSettingsName": "[concat(parameters('webAppName'),'-httpsettings')]",
-    "appGatewayBackendPoolName": "[concat(parameters('webAppName'),'-backendpool')]",
-    "appGatewayFrontendPortName": "[concat(parameters('webAppName'),'-port')]",
-    "appGatewayFrontendIPConfigName": "[concat(parameters('webAppName'),'-ipconfig')]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/28",
     "nestedTemplatesFolder": "nested",
@@ -191,115 +150,6 @@
             "name": "[variables('subnetName')]",
             "properties": {
               "addressPrefix": "[variables('subnetPrefix')]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2017-06-01",
-      "name": "[variables('applicationGatewayName')]",
-      "type": "Microsoft.Network/applicationGateways",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-        "wscopy"
-      ],
-      "properties": {
-        "sku": {
-          "name": "[parameters('size')]",
-          "tier": "Standard",
-          "capacity": "[parameters('capacity')]"
-        },
-        "gatewayIPConfigurations": [
-          {
-            "name": "[variables('appGatewayIPConfigName')]",
-            "properties": {
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              }
-            }
-          }
-        ],
-        "frontendIPConfigurations": [
-          {
-            "name": "[variables('appGatewayFrontendIPConfigName')]",
-            "properties": {
-              "PublicIPAddress": {
-                "id": "[variables('publicIPRef')]"
-              }
-            }
-          }
-        ],
-        "frontendPorts": [
-          {
-            "name": "[variables('appGatewayFrontendPortName')]",
-            "properties": {
-              "Port": 80
-            }
-          }
-        ],
-        "backendAddressPools": [
-          {
-            "name": "[variables('appGatewayBackendPoolName')]",
-            "properties": {
-              "BackendAddresses": [
-                {
-                  "IpAddress": "[reference(concat(variables('wsDeploymentName'),'1')).outputs.fqdn.value]"
-                },
-                {
-                  "IpAddress": "[reference(concat(variables('wsDeploymentName'),'2')).outputs.fqdn.value]"
-                }
-              ]
-            }
-          }
-        ],
-        "backendHttpSettingsCollection": [
-          {
-            "name": "[variables('appGatewayBackendHttpSettingsName')]",
-            "properties": {
-              "Port": 80,
-              "Protocol": "Http",
-              "CookieBasedAffinity": "[parameters('cookieBasedAffinity')]",
-              "requestTimeout": 30,
-              "requestRoutingRules": [
-                {
-                  "id": "[concat(variables('applicationGatewayID'), '/requestRoutingRules/', variables('appGatewayrequestRoutingRuleName'))]"
-                }
-              ]
-            }
-          }
-        ],
-        "httpListeners": [
-          {
-            "name": "[variables('appGatewayHttpListenerName')]",
-            "properties": {
-              "FrontendIPConfiguration": {
-                "Id": "[concat(variables('applicationGatewayID'), '/frontendIPConfigurations/', variables('appGatewayFrontendIPConfigName'))]"
-              },
-              "FrontendPort": {
-                "Id": "[concat(variables('applicationGatewayID'), '/frontendPorts/', variables('appGatewayFrontendPortName'))]"
-              },
-              "Protocol": "Http",
-              "SslCertificate": null
-            }
-          }
-        ],
-        "requestRoutingRules": [
-          {
-            "Name": "[variables('appGatewayrequestRoutingRuleName')]",
-            "properties": {
-              "RuleType": "Basic",
-              "httpListener": {
-                "id": "[concat(variables('applicationGatewayID'), '/httpListeners/', variables('appGatewayHttpListenerName'))]"
-              },
-              "backendAddressPool": {
-                "id": "[concat(variables('applicationGatewayID'), '/backendAddressPools/', variables('appGatewayBackendPoolName'))]"
-              },
-              "backendHttpSettings": {
-                "id": "[concat(variables('applicationGatewayID'), '/backendHttpSettingsCollection/', variables('appGatewayBackendHttpSettingsName'))]"
-              }
             }
           }
         ]
