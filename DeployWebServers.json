@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "dnsName": {
-      "type": "string",
-      "metadata": {
-        "description": "Traffic Manager profile DNS name. Must be unique in .trafficmanager.net"
-      }
-    },
     "primarylocation": {
       "type": "string",
       "allowedValues": [
@@ -56,18 +50,6 @@
         "description": "Location of the secondary endpoint"
       }
     },
-    "trafficRoutingMethod": {
-      "type": "string",
-      "allowedValues": [
-        "Priority",
-        "Weighted",
-        "Performance"
-      ],
-      "defaultValue": "Priority",
-      "metadata": {
-        "description": "Traffic routing methods available in Traffic Manager"
-      }
-    },
     "adminUsername": {
       "type": "string",
       "minLength": 1,
@@ -102,7 +84,7 @@
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/28",
     "nestedTemplatesFolder": "nested",
-    "appGwTemplateName": "azuredeployappgw.json",
+    "webAppTemplateName": "azuredeploywebapp.json",
     "location": [
       "[parameters('primarylocation')]",
       "[parameters('secondarylocation')]"
@@ -111,16 +93,16 @@
   "resources": [
     {
       "apiVersion": "2015-01-01",
-      "name": "[concat('appgw', copyIndex(1))]",
+      "name": "[concat('webapp', copyIndex(1))]",
       "type": "Microsoft.Resources/deployments",
       "copy": {
-        "name": "appgwcopy",
+        "name": "webappcopy",
         "count": 2
       },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplatesFolder'), '/', variables('appGwTemplateName'))]",
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplatesFolder'), '/', variables('webAppTemplateName'))]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -133,8 +115,8 @@
           "location": {
             "value": "[variables('location')[copyIndex()]]"
           },
-          "appGwName": {
-            "value": "[concat('appgw', copyIndex(1))]"
+          "webAppName": {
+            "value": "[concat('webApp', copyIndex(1))]"
           },
           "_artifactsLocation": {
             "value": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplatesFolder'))]"
@@ -158,49 +140,6 @@
             "name": "[variables('subnetName')]",
             "properties": {
               "addressPrefix": "[variables('subnetPrefix')]"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "apiVersion": "2015-11-01",
-      "type": "Microsoft.Network/trafficManagerProfiles",
-      "name": "trafficManagerDemo",
-      "location": "global",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
-        "appgwcopy"
-      ],
-      "properties": {
-        "profileStatus": "Enabled",
-        "trafficRoutingMethod": "[parameters('trafficRoutingMethod')]",
-        "dnsConfig": {
-          "relativeName": "[parameters('dnsName')]",
-          "ttl": 30
-        },
-        "monitorConfig": {
-          "protocol": "HTTP",
-          "port": 80,
-          "path": "/"
-        },
-        "endpoints": [
-          {
-            "name": "endpoint1",
-            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-            "properties": {
-              "targetResourceId": "[reference('appgw1').outputs.ipId.value]",
-              "endpointStatus": "Enabled",
-              "weight": 1
-            }
-          },
-          {
-            "name": "endpoint2",
-            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
-            "properties": {
-              "targetResourceId": "[reference('appgw2').outputs.ipId.value]",
-              "endpointStatus": "Enabled",
-              "weight": 1
             }
           }
         ]

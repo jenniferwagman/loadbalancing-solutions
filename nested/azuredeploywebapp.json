@@ -73,7 +73,7 @@
         "description": "Location of resources"
       }
     },
-    "appGwName": {
+    "webAppName": {
       "type": "string",
       "minLength": 1,
       "metadata": {
@@ -88,22 +88,22 @@
     }
   },
   "variables": {
-    "applicationGatewayName": "[parameters('appGwName')]",
-    "publicIPAddressName": "[concat(parameters('appGwName'),'IP')]",
-    "virtualNetworkName": "[concat(parameters('appGwName'),'VNet')]",
-    "subnetName": "[concat(parameters('appGwName'),'Subnet')]",
+    "applicationGatewayName": "[parameters('webAppName')]",
+    "publicIPAddressName": "[concat(parameters('webAppName'),'IP')]",
+    "virtualNetworkName": "[concat(parameters('webAppName'),'VNet')]",
+    "subnetName": "[concat(parameters('webAppName'),'Subnet')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
     "applicationGatewayID": "[resourceId('Microsoft.Network/applicationGateways',variables('applicationGatewayName'))]",
-    "backendDnsPrefix": "[concat(parameters('appGwName'),'-backend-')]",
-    "wsDeploymentName": "[concat(parameters('appGwName'),'ws')]",
-    "appGatewayIPConfigName": "[concat(parameters('appGwName'),'-ipconfig')]",
-    "appGatewayrequestRoutingRuleName": "[concat(parameters('appGwName'),'-rule1')]",
-    "appGatewayHttpListenerName": "[concat(parameters('appGwName'),'-listener')]",
-    "appGatewayBackendHttpSettingsName": "[concat(parameters('appGwName'),'-httpsettings')]",
-    "appGatewayBackendPoolName": "[concat(parameters('appGwName'),'-backendpool')]",
-    "appGatewayFrontendPortName": "[concat(parameters('appGwName'),'-port')]",
-    "appGatewayFrontendIPConfigName": "[concat(parameters('appGwName'),'-ipconfig')]",
+    "backendDnsPrefix": "[concat(parameters('webAppName'),'-backend-')]",
+    "wsDeploymentName": "[concat(parameters('webAppName'),'ws')]",
+    "appGatewayIPConfigName": "[concat(parameters('webAppName'),'-ipconfig')]",
+    "appGatewayrequestRoutingRuleName": "[concat(parameters('webAppName'),'-rule1')]",
+    "appGatewayHttpListenerName": "[concat(parameters('webAppName'),'-listener')]",
+    "appGatewayBackendHttpSettingsName": "[concat(parameters('webAppName'),'-httpsettings')]",
+    "appGatewayBackendPoolName": "[concat(parameters('webAppName'),'-backendpool')]",
+    "appGatewayFrontendPortName": "[concat(parameters('webAppName'),'-port')]",
+    "appGatewayFrontendIPConfigName": "[concat(parameters('webAppName'),'-ipconfig')]",
     "addressPrefix": "10.0.0.0/16",
     "subnetPrefix": "10.0.0.0/28",
     "nestedTemplatesFolder": "nested",
