@@ -116,7 +116,7 @@
             "value": "[variables('location')[copyIndex()]]"
           },
           "webAppName": {
-            "value": "[concat('webApp', copyIndex(1))]"
+            "value": "[concat('app', copyIndex(1))]"
           },
           "_artifactsLocation": {
             "value": "[concat(parameters('_artifactsLocation'), '/', variables('nestedTemplatesFolder'))]"
