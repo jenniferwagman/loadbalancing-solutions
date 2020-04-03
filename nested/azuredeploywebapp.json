@@ -95,7 +95,7 @@
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
     "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]",
     "applicationGatewayID": "[resourceId('Microsoft.Network/applicationGateways',variables('applicationGatewayName'))]",
-    "backendDnsPrefix": "[concat(parameters('webAppName'),'-backend-')]",
+    "backendDnsPrefix": "[concat(parameters('webAppName'),'backend')]",
     "wsDeploymentName": "[concat(parameters('webAppName'),'ws')]",
     "appGatewayIPConfigName": "[concat(parameters('webAppName'),'-ipconfig')]",
     "appGatewayrequestRoutingRuleName": "[concat(parameters('webAppName'),'-rule1')]",
